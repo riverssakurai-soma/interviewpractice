@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interview Question Practice</title>
     <style>
         body {
@@ -100,6 +101,18 @@
             max-width: 600px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
+        #count {
+            font-size: 1.2em;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 500px) {
+            button {
+                font-size: 1.5em;
+                padding: 12px 25px;
+            }
+        }
     </style>
 </head>
 
@@ -110,6 +123,7 @@
 
     <div id="question">Press "Start" to begin!</div>
     <div id="timer">30</div>
+    <div id="count">Answered: 0 / 21</div>
 
     <div class="buttons">
         <button id="answered">Answered</button>
@@ -163,12 +177,15 @@
         const answeredBtn = document.getElementById("answered");
         const pauseBtn = document.getElementById("pause");
         const revealBtn = document.getElementById("reveal");
+        const countBox = document.getElementById("count");
 
         let timer;
         let timeLeft = 30;
         let isPaused = false;
         let currentQuestion = {};
         let questionQueue = [];
+        let answeredCount = 0;
+        const totalQuestions = questions.length;
 
         function shuffleQuestions() {
             questionQueue = questions.map(q => ({ ...q })).sort(() => Math.random() - 0.5);
@@ -209,8 +226,14 @@
 
         function nextQuestion() {
             if (questionQueue.length === 0) {
-                shuffleQuestions();
+                questionBox.textContent = "All questions completed! 🎉 Press 'Start' to shuffle again.";
+                japaneseBox.textContent = "";
+                clearInterval(timer);
+                return;
             }
+
+            answeredCount++;
+            countBox.textContent = `Answered: ${answeredCount} / ${totalQuestions}`;
 
             currentQuestion = questionQueue.pop();
             questionBox.textContent = currentQuestion.en;
