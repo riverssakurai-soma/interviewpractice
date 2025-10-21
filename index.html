@@ -25,7 +25,7 @@
         #timer {
             font-size: 3em;
             font-weight: bold;
-            color: #e74c3c;
+            color: #dc5c4d;
             background: #fff5f5;
             padding: 15px 0;
             border-radius: 10px;
@@ -50,7 +50,7 @@
         #reveal {
             display: block;
             margin: 15px auto;
-            background: #c1691b;
+            background: #2ecc71;
             font-size: 1.2em;
             padding: 12px 25px;
             color: white;
@@ -64,7 +64,7 @@
         #start {
             font-size: 1.8em;
             padding: 15px 50px;
-            background: #23a157;
+            background: #e67e22;
             margin-top: 20px;
             color: white;
             font-weight: bold;
@@ -111,7 +111,6 @@
     <div id="question">Press "Start" to begin!</div>
     <div id="timer">30</div>
 
-    <!-- Prominent bold white buttons directly under English question -->
     <div class="buttons">
         <button id="answered">Answered</button>
         <button id="pause">⏸️</button>
@@ -157,7 +156,6 @@
             { en: "Have you ever traveled outside of Japan?", jp: "日本の外に旅行したことはありますか？" }
         ];
 
-
         const questionBox = document.getElementById("question");
         const japaneseBox = document.getElementById("japanese");
         const timerBox = document.getElementById("timer");
@@ -170,6 +168,11 @@
         let timeLeft = 30;
         let isPaused = false;
         let currentQuestion = {};
+        let questionQueue = [];
+
+        function shuffleQuestions() {
+            questionQueue = questions.map(q => ({ ...q })).sort(() => Math.random() - 0.5);
+        }
 
         function startTimer() {
             clearInterval(timer);
@@ -205,14 +208,19 @@
         }
 
         function nextQuestion() {
-            const randomIndex = Math.floor(Math.random() * questions.length);
-            currentQuestion = questions[randomIndex];
+            if (questionQueue.length === 0) {
+                shuffleQuestions();
+            }
+
+            currentQuestion = questionQueue.pop();
             questionBox.textContent = currentQuestion.en;
             japaneseBox.textContent = "";
             timeLeft = 30;
             timerBox.textContent = timeLeft;
             startTimer();
         }
+
+        shuffleQuestions();
 
         startBtn.addEventListener("click", nextQuestion);
         answeredBtn.addEventListener("click", nextQuestion);
