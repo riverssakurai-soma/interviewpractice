@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Interview Question Practice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 30px;
+            background: #f2f2f2;
+        }
+
+        #question,
+        #japanese {
+            font-size: 1.5em;
+            margin: 20px 0;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #timer {
+            font-size: 3em;
+            font-weight: bold;
+            color: #e74c3c;
+            background: #fff5f5;
+            padding: 15px 0;
+            border-radius: 10px;
+            margin: 20px auto;
+            width: 150px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .buttons {
+            margin: 10px 0;
+        }
+
+        button {
+            margin: 8px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #reveal {
+            display: block;
+            margin: 15px auto;
+            background: #c1691b;
+            font-size: 1.2em;
+            padding: 12px 25px;
+            color: white;
+            font-weight: bold;
+        }
+
+        #reveal:hover {
+            background: #27ae60;
+        }
+
+        #start {
+            font-size: 1.8em;
+            padding: 15px 50px;
+            background: #23a157;
+            margin-top: 20px;
+            color: white;
+            font-weight: bold;
+        }
+
+        #start:hover {
+            background: #d35400;
+        }
+
+        #answered,
+        #pause {
+            font-size: 1.3em;
+            padding: 12px 30px;
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        #answered:hover,
+        #pause:hover {
+            background: #2980b9;
+        }
+
+        #instructions {
+            font-size: 1.2em;
+            margin: 20px auto;
+            background: #fff8dc;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Interview Question Practice</h1>
+
+    <button id="start">Start / スタート</button>
+
+    <div id="question">Press "Start" to begin!</div>
+    <div id="timer">30</div>
+
+    <!-- Prominent bold white buttons directly under English question -->
+    <div class="buttons">
+        <button id="answered">Answered</button>
+        <button id="pause">⏸️</button>
+    </div>
+
+    <button id="reveal">日本語で表示</button>
+    <div id="japanese"></div>
+
+    <div id="instructions">
+        <p><strong>Instructions / 使い方</strong></p>
+        <p>Press "Start" to show a question in English. <br>
+            Press "Answered" when you finish your answer. <br>
+            Press "日本語で表示" to see the Japanese translation. <br>
+            Use the ⏸️ button to pause/resume the timer.</p>
+        <p>「Start」を押すと英語の質問が表示されます。<br>
+            答え終わったら「Answered」を押してください。<br>
+            「日本語で表示」を押すと日本語訳が表示されます。<br>
+            ⏸️ボタンでタイマーを一時停止/再開できます。</p>
+    </div>
+
+    <script>
+        const questions = [
+            { en: "Can you introduce yourself?", jp: "自己紹介をしてください" },
+            { en: "What are your hobbies or interests?", jp: "趣味や興味は何ですか？" },
+            { en: "Tell me about your family.", jp: "家族について話してください" },
+            { en: "Why do you want to study abroad?", jp: "なぜ留学したいですか？" },
+            { en: "Why did you choose [Country]?", jp: "なぜ「国」を選びましたか？" },
+            { en: "What do you want to learn during this program?", jp: "このプログラムで何を学びたいですか？" },
+            { en: "What course or program did you choose, and why?", jp: "なぜこのプログラムを選びましたか？" },
+            { en: "How will this experience help your future?", jp: "この経験は将来どのように役立つと思いますか？" },
+            { en: "What do you want to do in the future?", jp: "将来は何をしたいですか？" },
+            { en: "How will you handle cultural differences?", jp: "文化の違いにどう対応しますか？" },
+            { en: "What will you do if you have trouble communicating in English?", jp: "コミュニケーションがうまくいかないとき、どうしますか？" },
+            { en: "What kind of person are you?", jp: "あなたはどんな性格ですか？" },
+            { en: "How do you make friends?", jp: "どのように友達を作りますか？" },
+            { en: "What is something you are proud of?", jp: "自分の自慢できることは何ですか？" },
+            { en: "What will you do if you are feeling homesick?", jp: "ホームシックになったら、どうしますか？" },
+            { en: "What do you know about (the country you will visit) culture?", jp: "訪問する国の文化について何を知っていますか？" },
+            { en: "What will you do when you graduate high school?", jp: "高校を卒業したら何をしますか？" }
+        ];
+
+        const questionBox = document.getElementById("question");
+        const japaneseBox = document.getElementById("japanese");
+        const timerBox = document.getElementById("timer");
+        const startBtn = document.getElementById("start");
+        const answeredBtn = document.getElementById("answered");
+        const pauseBtn = document.getElementById("pause");
+        const revealBtn = document.getElementById("reveal");
+
+        let timer;
+        let timeLeft = 30;
+        let isPaused = false;
+        let currentQuestion = {};
+
+        function startTimer() {
+            clearInterval(timer);
+            isPaused = false;
+            pauseBtn.textContent = "⏸️";
+            timerBox.style.color = "#e74c3c";
+            timerBox.style.fontSize = "3em";
+            timerBox.style.fontWeight = "bold";
+
+            timer = setInterval(() => {
+                if (!isPaused) {
+                    timeLeft--;
+                    timerBox.textContent = timeLeft;
+
+                    if (timeLeft <= 5) {
+                        timerBox.style.color = "#c0392b";
+                        timerBox.style.fontSize = "3.5em";
+                        timerBox.style.fontWeight = "bold";
+                    } else {
+                        timerBox.style.color = "#e74c3c";
+                        timerBox.style.fontSize = "3em";
+                    }
+
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        questionBox.textContent = "Time's up! Press 'Answered' or 'Start' for the next question.";
+                        japaneseBox.textContent = "";
+                        timerBox.style.color = "#e74c3c";
+                        timerBox.style.fontSize = "3em";
+                    }
+                }
+            }, 1000);
+        }
+
+        function nextQuestion() {
+            const randomIndex = Math.floor(Math.random() * questions.length);
+            currentQuestion = questions[randomIndex];
+            questionBox.textContent = currentQuestion.en;
+            japaneseBox.textContent = "";
+            timeLeft = 30;
+            timerBox.textContent = timeLeft;
+            startTimer();
+        }
+
+        startBtn.addEventListener("click", nextQuestion);
+        answeredBtn.addEventListener("click", nextQuestion);
+        pauseBtn.addEventListener("click", () => {
+            isPaused = !isPaused;
+            pauseBtn.textContent = isPaused ? "▶️" : "⏸️";
+        });
+        revealBtn.addEventListener("click", () => {
+            japaneseBox.textContent = currentQuestion.jp;
+        });
+    </script>
+</body>
+
+</html>
