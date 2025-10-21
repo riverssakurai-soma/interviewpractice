@@ -224,12 +224,18 @@
             }, 1000);
         }
 
-        function nextQuestion() {
+        function nextQuestion(isStart = false) {
             if (questionQueue.length === 0) {
-                questionBox.textContent = "All questions completed! 🎉 Press 'Start' to shuffle again.";
-                japaneseBox.textContent = "";
-                clearInterval(timer);
-                return;
+                if (isStart) {
+                    shuffleQuestions();
+                    answeredCount = 0;
+                    countBox.textContent = `Answered: ${answeredCount} / ${totalQuestions}`;
+                } else {
+                    questionBox.textContent = "All questions completed! 🎉 Press 'Start' to shuffle again.";
+                    japaneseBox.textContent = "";
+                    clearInterval(timer);
+                    return;
+                }
             }
 
             answeredCount++;
@@ -245,8 +251,8 @@
 
         shuffleQuestions();
 
-        startBtn.addEventListener("click", nextQuestion);
-        answeredBtn.addEventListener("click", nextQuestion);
+        startBtn.addEventListener("click", () => nextQuestion(true));
+        answeredBtn.addEventListener("click", () => nextQuestion(false));
         pauseBtn.addEventListener("click", () => {
             isPaused = !isPaused;
             pauseBtn.textContent = isPaused ? "▶️" : "⏸️";
